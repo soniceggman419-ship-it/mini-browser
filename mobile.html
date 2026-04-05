@@ -1,18 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>HTML-Only Browser</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mobile UI</title>
   <link rel="stylesheet" href="mobilestyles.css" />
 </head>
 <body>
-  <div class="toolbar">
-    <input type="text" id="urlInput" placeholder="Enter URL (https://...)" />
-    <button id="goBtn">Go</button>
-  </div>
+  <header class="toolbar" role="toolbar" aria-label="Navigation">
+    <button id="backBtn" aria-label="Back" class="icon">◀</button>
 
-  <iframe id="viewer"></iframe>
-   <script src="app.js"></script>
-  <script type="module" src="main.js"></script>
+    <div class="input-wrap" aria-hidden="false">
+      <label for="urlInput" class="visually-hidden">URL</label>
+      <input
+        type="text"
+        id="urlInput"
+        inputmode="url"
+        placeholder=""
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        aria-label="Address"
+      />
+      <button id="clearBtn" aria-label="Clear" class="icon">✕</button>
+    </div>
+
+    <button id="menuBtn" aria-label="Menu" class="icon">⋯</button>
+  </header>
+
+  <main id="viewer" class="viewer" role="main" aria-label="Content area" tabindex="0"></main>
+
+  <script>
+    // Minimal UI-only behavior for GitHub Pages (no external navigation)
+    (function () {
+      const urlInput = document.getElementById('urlInput');
+      const clearBtn = document.getElementById('clearBtn');
+      const backBtn = document.getElementById('backBtn');
+      const menuBtn = document.getElementById('menuBtn');
+      const viewer = document.getElementById('viewer');
+
+      // Keep interactions local-only: input does not load external content.
+      clearBtn.addEventListener('click', () => { urlInput.value = ''; urlInput.focus(); });
+
+      // Simple keyboard handling: Enter blurs the field (no navigation)
+      urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          urlInput.blur();
+        }
+      });
+
+      // Basic UI actions (no network)
+      backBtn.addEventListener('click', () => {
+        // placeholder for UI-only back action (no history navigation)
+        viewer.focus();
+      });
+      menuBtn.addEventListener('click', () => {
+        // simple local menu toggle for GitHub Pages UI-only
+        const menu = document.createElement('div');
+        menu.className = 'menu';
+        menu.innerHTML = '<button class="menu-item" type="button">Option</button>';
+        document.body.appendChild(menu);
+        setTimeout(() => menu.remove(), 220); // transient UI element
+      });
+
+      // Ensure viewer remains blank/responsive for mobile layout
+      viewer.addEventListener('touchstart', () => viewer.focus(), { passive: true });
+    })();
+  </script>
 </body>
 </html>
