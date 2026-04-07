@@ -4,26 +4,12 @@ import { renderPage } from "./renderer.js";
 import { enableLinkNavigation } from "./linkHandler.js";
 import { pushHistory } from "./history.js";
 
-
-async function loadPage() {
-  let url = input.value.trim();
-  if (!url.startsWith("http")) url = "https://" + url;
-
-  pushHistory(url);
-
-  const rawHTML = await fetchPage(url);
-  const cleanHTML = sanitizeHTML(rawHTML);
-  renderPage(cleanHTML);
-
 const viewer = document.getElementById("viewer");
-enableLinkNavigation(viewer);
 const input = document.getElementById("urlInput");
 const button = document.getElementById("goBtn");
 
-button.addEventListener("click", loadPage);
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") loadPage();
-});
+// Enable link handling once
+enableLinkNavigation(viewer);
 
 async function loadPage() {
   let url = input.value.trim();
@@ -33,6 +19,8 @@ async function loadPage() {
   }
 
   try {
+    pushHistory(url);
+
     const rawHTML = await fetchPage(url);
     const cleanHTML = sanitizeHTML(rawHTML);
     renderPage(cleanHTML);
@@ -41,3 +29,12 @@ async function loadPage() {
     console.error(err);
   }
 }
+
+// Event listeners
+button.addEventListener("click", loadPage);
+
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    loadPage();
+  }
+});
