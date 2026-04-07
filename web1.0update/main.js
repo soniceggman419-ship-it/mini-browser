@@ -14,7 +14,7 @@ async function loadPage() {
   const rawHTML = await fetchPage(url);
   const cleanHTML = sanitizeHTML(rawHTML);
   renderPage(cleanHTML);
-}
+
 const viewer = document.getElementById("viewer");
 enableLinkNavigation(viewer);
 const input = document.getElementById("urlInput");
