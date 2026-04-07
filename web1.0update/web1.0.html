@@ -2,17 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>HTML-Only Browser</title>
+  <title>Web 1.0 Browser</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
   <div class="toolbar">
-    <input type="text" id="urlInput" placeholder="Enter URL (https://...)" />
+    <button id="backBtn">←</button>
+    <button id="forwardBtn">→</button>
+
+    <input type="text" id="urlInput" placeholder="Enter URL or search..." />
     <button id="goBtn">Go</button>
+
+    <button id="bookmarkBtn">★</button>
+
+    <label class="toggle">
+      <input type="checkbox" id="textModeToggle" />
+      Text Mode
+    </label>
   </div>
 
+  <div class="bookmarksBar" id="bookmarksBar"></div>
+
   <iframe id="viewer"></iframe>
-   <script src="app.js"></script>
+
+  <div class="statusBar" id="statusBar">Ready</div>
+
+  <script src="app.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 </html>
