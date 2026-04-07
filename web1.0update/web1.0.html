@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Web 1.0 Browser</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <div class="toolbar">
-    <button id="backBtn">←</button>
-    <button id="forwardBtn">→</button>
+    <button id="backBtn" title="Back">←</button>
+    <button id="forwardBtn" title="Forward">→</button>
 
-    <input type="text" id="urlInput" placeholder="Enter URL or search..." />
+    <input 
+      type="text" 
+      id="urlInput" 
+      placeholder="Enter URL or search..." 
+      autocomplete="off"
+    />
+
     <button id="goBtn">Go</button>
 
-    <button id="bookmarkBtn">★</button>
+    <button id="bookmarkBtn" title="Save Bookmark">★</button>
 
-    <label class="toggle">
+    <label class="toggle" title="Toggle text-only mode">
       <input type="checkbox" id="textModeToggle" />
       Text Mode
     </label>
   </div>
 
+  <!-- Bookmarks -->
   <div class="bookmarksBar" id="bookmarksBar"></div>
 
-  <iframe id="viewer"></iframe>
+  <!-- Viewer -->
+  <iframe 
+    id="viewer"
+    sandbox="allow-same-origin"
+  ></iframe>
 
+  <!-- Status -->
   <div class="statusBar" id="statusBar">Ready</div>
 
   <script src="app.js"></script>
