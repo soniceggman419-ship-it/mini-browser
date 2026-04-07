@@ -1,5 +1,5 @@
 // Legacy fallback loader (used only if modular system fails)
-
+import { legacyLoad } from "./app.js";
 const proxy = "https://api.allorigins.win/raw?url=";
 
 export async function legacyLoad(url, viewer) {
