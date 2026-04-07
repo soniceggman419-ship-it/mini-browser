@@ -1,4 +1,3 @@
-// Legacy page loader (Web 1.0 friendly)
 const input = document.getElementById("urlInput");
 const button = document.getElementById("goBtn");
 const viewer = document.getElementById("viewer");
@@ -6,56 +5,55 @@ const statusBar = document.getElementById("statusBar"); // optional
 
 const proxy = "https://api.allorigins.win/raw?url=";
 
-// Optional: history support
 const historyStack = [];
 let historyIndex = -1;
 
-// Event listeners
 button.addEventListener("click", () => loadPage(input.value));
 input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") loadPage(input.value);
 });
 
-// Optional back/forward
 const backBtn = document.getElementById("backBtn");
 const forwardBtn = document.getElementById("forwardBtn");
-
 if (backBtn) backBtn.addEventListener("click", () => navigateHistory(-1));
 if (forwardBtn) forwardBtn.addEventListener("click", () => navigateHistory(1));
 
-// Main loader
 async function loadPage(url) {
   if (!url) return;
   if (!url.startsWith("http")) url = "https://" + url;
 
-  // Update input
   input.value = url;
-
-  // Push history
   pushHistory(url);
 
   try {
     if (statusBar) statusBar.textContent = "Loading...";
+    
     const res = await fetch(proxy + encodeURIComponent(url));
-    let html = await res.text();
+    const contentType = res.headers.get("Content-Type") || "";
+    let text = await res.text();
 
-    // 🔥 Strip everything except structural HTML
+    // ===== Detect plain text =====
+    if (contentType.includes("text/plain") || url.endsWith(".txt")) {
+      // Render as plain text inside <pre>
+      const blob = new Blob([`<pre>${escapeHTML(text)}</pre>`], { type: "text/html" });
+      viewer.src = URL.createObjectURL(blob);
+    } else {
+      // Old Web 1.0 HTML sanitizer
+      text = text.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+      text = text.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "");
+      text = text.replace(/<link[\s\S]*?rel=["']?stylesheet["']?[\s\S]*?>/gi, "");
+      text = text.replace(/<img[\s\S]*?>/gi, "");
+      text = text.replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "");
+      text = text.replace(/style="[^"]*"/gi, "");
+      text = text.replace(/on\w+="[^"]*"/gi, "");
+      text = text.replace(/<(\w+)[^>]*>/g, "<$1>");
 
-    html = html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
-    html = html.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "");
-    html = html.replace(/<link[\s\S]*?rel=["']?stylesheet["']?[\s\S]*?>/gi, "");
-    html = html.replace(/<img[\s\S]*?>/gi, "");
-    html = html.replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "");
-    html = html.replace(/style="[^"]*"/gi, "");
-    html = html.replace(/on\w+="[^"]*"/gi, "");
-    html = html.replace(/<(\w+)[^>]*>/g, "<$1>");
-
-    // Render
-    const blob = new Blob([html], { type: "text/html" });
-    const blobURL = URL.createObjectURL(blob);
-    viewer.src = blobURL;
+      const blob = new Blob([text], { type: "text/html" });
+      viewer.src = URL.createObjectURL(blob);
+    }
 
     if (statusBar) statusBar.textContent = "Done";
+
   } catch (err) {
     if (statusBar) statusBar.textContent = "Error";
     alert("Failed to load page.");
@@ -65,7 +63,6 @@ async function loadPage(url) {
 
 // ===== History helpers =====
 function pushHistory(url) {
-  // Trim forward history if any
   historyStack.splice(historyIndex + 1);
   historyStack.push(url);
   historyIndex = historyStack.length - 1;
@@ -77,4 +74,12 @@ function navigateHistory(offset) {
     historyIndex = newIndex;
     loadPage(historyStack[historyIndex]);
   }
+}
+
+// ===== Helper to escape HTML inside <pre> =====
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
